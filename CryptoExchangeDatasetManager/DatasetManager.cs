@@ -19,7 +19,7 @@ namespace CryptoExchangeDatasetManager
             stopWatch.Start();
 
             _client = new ClientRest();
-            _path = @$"{startDate.Date.ToString("ddMMyy")}--{DateTime.Now.Date.ToString("ddMMyy")}.txt";
+            _path = @$"{pairSymbol}-{startDate.Date.ToString("yyMMdd")}--{DateTime.Now.Date.ToString("yyMMdd")}.txt";
 
             Console.WriteLine(stopWatch.Elapsed);
             // Store Data in a stream
