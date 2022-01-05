@@ -1,5 +1,6 @@
 ﻿using Automate.Infrastructure.ServicesExternes;
 using Automate.Infrastructure.ServicesExternes.Binance;
+using Automate.Infrastructure.ServicesExternes.Binance.Responses;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
@@ -14,6 +15,7 @@ namespace CryptoExchangeDatasetManager
         public static async Task GetExchangeDataset(DateTime startDate, string pairSymbol, string interval)
         {
             var stopWatch = new Stopwatch();
+            List<Kline> klines = new List<Kline>();
             stopWatch.Start();
 
             _client = new ClientRest();
@@ -37,13 +39,8 @@ namespace CryptoExchangeDatasetManager
                 try
                 {
                     var endDate = startDate.AddHours(500);
-                    var klines = await _client.GetKlinesAsync(pairSymbol, startDate, endDate, interval);
+                    klines.AddRange((await _client.GetKlinesAsync(pairSymbol, startDate, endDate, interval)).Klines);
                     startDate = endDate.AddHours(1);
-
-                    klines.Klines.ForEach(kline => {
-                        _stream.WriteLine(JsonConvert.SerializeObject(kline));
-                        });
-
                 }
                 catch (Exception ex)
                 {
@@ -52,6 +49,7 @@ namespace CryptoExchangeDatasetManager
                     Console.WriteLine(ex.Message);
                 }
             }
+            _stream.Write(JsonConvert.SerializeObject(klines));
             Console.WriteLine(stopWatch.Elapsed);
             _stream.Dispose();
         }
